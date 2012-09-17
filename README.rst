@@ -2,6 +2,8 @@
  Cheese Prism
 ================
 
+.. image:: https://secure.travis-ci.org/whitmo/CheesePrism.png
+
 A simple application for managing a static python package index.  It
 borrows heavily from `BasketWeaver
 <https://github.com/binarydud/basket-weaver>`_ and `cheese_emporium
