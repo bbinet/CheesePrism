@@ -103,7 +103,7 @@ class IndexTestCase(unittest.TestCase):
 
                actual:
 
-                %s""") %(pprint(sorted(expected)), pprint(sorted(file_structure)))
+                %s""") %(pprint(sorted(str(x) for x in expected)), pprint(sorted(str(x) for x in file_structure)))
 
     @patch('cheeseprism.index.IndexManager.regenerate_leaf')
     def test_regenerate_leaf_event(self, rl):
