@@ -16,10 +16,12 @@ requires = ['Jinja2',
             'Paste',
             'pip']
 
+version='0.2a1'
+
 test_requires = ['mock', 'nose'] + requires
 
 setup(name='CheesePrism',
-      version='0.1a2',
+      version=version,
       description='CheesePrism',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
@@ -41,6 +43,5 @@ setup(name='CheesePrism',
       entry_points = """\
       [paste.app_factory]
       main = cheeseprism.wsgiapp:main
-      """,
-      paster_plugins=['pyramid'],
+      """
       )
