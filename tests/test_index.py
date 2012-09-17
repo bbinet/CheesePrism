@@ -103,7 +103,7 @@ class IndexTestCase(unittest.TestCase):
 
                actual:
 
-                %s""") %(pprint(expected), pprint(file_structure))
+                %s""") %(pprint(sorted(expected)), pprint(sorted(file_structure)))
 
     @patch('cheeseprism.index.IndexManager.regenerate_leaf')
     def test_regenerate_leaf_event(self, rl):
@@ -224,3 +224,4 @@ class ClassOrStaticMethods(unittest.TestCase):
 
 def test_cleanup():
     assert not IndexTestCase.get_base().dirs()
+
