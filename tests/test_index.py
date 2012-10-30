@@ -5,6 +5,7 @@ from mock import patch
 from nose.tools import raises
 from path import path
 from pprint import pformat as pprint
+from stuf import stuf
 import logging
 import textwrap
 import unittest
@@ -136,8 +137,11 @@ class IndexTestCase(unittest.TestCase):
     @patch('pyramid.threadlocal.get_current_registry')
     def test_notify_packages_added(self, getreg):
         from cheeseprism.index import notify_packages_added
-        pkg = dict(name='pkg', version='0.1'); pkgs = pkg,
+        pkg = stuf(name='dummypackage', version='0.1',
+                   filename=self.dummy.name)
+        pkgs = pkg,
         index = Mock(name='index')
+        index.path = self.im.path
         reg = getreg.return_value = Mock(name='registry')                
         out = list(notify_packages_added(index, pkgs))
 
@@ -147,7 +151,7 @@ class IndexTestCase(unittest.TestCase):
         (event,), _ = reg.notify.call_args
         assert event.im is index
         assert event.version == '0.1'
-        assert event.name == 'pkg'
+        assert event.name == 'dummypackage'
 
     @raises(StopIteration)
     def test_notify_packages_added_raises(self):

@@ -1,6 +1,6 @@
 from cheeseprism import index
-from contextlib import contextmanager
 from cheeseprism.resources import App
+from contextlib import contextmanager
 from mock import Mock
 from mock import patch
 from nose.tools import raises
@@ -9,6 +9,7 @@ from pyramid import testing
 from pyramid.decorator import reify
 from pyramid.events import subscriber
 from pyramid.httpexceptions import HTTPFound
+from stuf import stuf
 from test_pipext import PipExtBase
 import itertools
 import unittest
@@ -82,7 +83,18 @@ class ViewTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
+    def setup_event(self):
+        self.event_results = {}
+        from cheeseprism.event import IPackageEvent
+        
+        @subscriber(IPackageEvent)
+        def test_event_fire(event):
+            self.event_results.setdefault(event.__class__.__name__, []).append(event)
+            
+        self.config.add_subscriber(test_event_fire)
+
     def tearDown(self):
+        self.event_results = None
         testing.tearDown()
         if CPDummyRequest.test_dir is not None:
             CPDummyRequest.test_dir.rmtree()
@@ -109,12 +121,12 @@ class ViewTests(unittest.TestCase):
         """
         pypi doesn't know anything about our package
         """
-        from cheeseprism.views import package
+        from cheeseprism.views import from_pypi
         pd.return_value = None
         request = testing.DummyRequest()
         request.matchdict.update(dict(name='boto',
                                       version='1.2.3'))
-        out = package(request)
+        out = from_pypi(request)
         assert isinstance(out, HTTPFound)
         assert out.location == '/find-packages'
 
@@ -241,16 +253,6 @@ class ViewTests(unittest.TestCase):
         request.method = 'POST'
         upload(context, request)
 
-    def setup_event(self):
-        self.event_results = {}
-        from cheeseprism.event import IPackageAdded
-        
-        @subscriber(IPackageAdded)
-        def test_event_fire(event):
-            self.event_results['fired'] = True
-            
-        self.config.add_subscriber(test_event_fire)
-
     @patch('path.path.write_bytes')
     def test_upload(self, wb):
         from cheeseprism.views import upload
@@ -258,10 +260,12 @@ class ViewTests(unittest.TestCase):
         context, request = self.base_cr
         request.method = 'POST'
         request.POST['content'] = FakeFS(path('dummypackage/dist/dummypackage-0.0dev.tar.gz'))
-        with patch('cheeseprism.index.IndexManager.register_archive',
-                   return_value=(dict(name='dummycode', version='0.0dev'), '123')) as aa:
+        with patch('cheeseprism.index.IndexManager.pkginfo_from_file',
+                   return_value=stuf(name='dummycode', version='0.0dev')) as pkif:
             res = upload(context, request)
-            assert aa.called
+            assert pkif.called
+            assert 'PackageAdded' in self.event_results
+            assert self.event_results['PackageAdded'][0].name == pkif.return_value.name
         assert res.headers == {'X-Swalow-Status': 'SUCCESS'}
 
     def test_from_requirements_GET(self):

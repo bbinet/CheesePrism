@@ -40,10 +40,7 @@ def upload(context, request):
         dest = path(request.file_root) / utils.secure_filename(fieldstorage.filename)
 
         dest.write_bytes(fieldstorage.file.read())
-        pkgdata, _ = request.index.register_archive(dest, registry=request.registry)
-        request.registry.notify(event.PackageAdded(request.index,
-                                               name=pkgdata['name'],
-                                               version=pkgdata['version']))
+        request.registry.notify(event.PackageAdded(request.index, path=dest))
         request.response.headers['X-Swalow-Status'] = 'SUCCESS'
         return request.response
     return {}
@@ -59,23 +56,25 @@ def find_package(context, request):
     return dict(releases=releases, search_term=search_term, here=url)
 
 
-def package(request, fpkgs='/find-packages'):
+def from_pypi(request, fpkgs='/find-packages'):
     """
     @@ convert to use action on a post rather than on a get
     """
     name = request.matchdict['name']
     version = request.matchdict['version']
-    details = PyPi.package_details(name, version)
+    dists = PyPi.release_urls(name, version)
     flash = request.session.flash 
-    if not details:
+    if not dists:
         flash("%s-%s not found" %(name, version))
         return HTTPFound(fpkgs)
-        
-    if details[0]['md5_digest'] in request.index_data:
+
+    candidates = [x for x in dists if request.index.SDIST_EXT.match(x['filename'])]
+
+    if candidates[0]['md5_digest'] in request.index_data:
         logger.debug('Package %s-%s already in index' %(name, version))
         return HTTPFound('/index/%s' %name)
             
-    details = details[0]
+    details = candidates[0]
     url = details['url']
     filename = details['filename']
     newfile = None
@@ -101,6 +100,7 @@ def package(request, fpkgs='/find-packages'):
             flash('Issue with adding %s to index: See logs: %s' % (newfile.name, e))
 
     return HTTPFound(fpkgs)
+package = from_pypi
 
 
 @view_config(name='regenerate-index', renderer='regenerate.html', context=resources.App)

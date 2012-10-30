@@ -29,6 +29,7 @@ class IndexManager(object):
 
     root_index_file = 'index.html'
     EXTS = re.compile(r'^.*(?P<ext>\.egg|\.gz|\.bz2|\.tgz|\.zip)$')
+    SDIST_EXT = re.compile(r'^.*(?P<ext>\.gz|\.bz2|\.tgz|\.zip)$')
 
     leaf_name = 'leaf.html'
     home_name = 'index.html'
@@ -151,7 +152,7 @@ class IndexManager(object):
 
     @classmethod
     def extension_of(cls, path):
-        match = cls.EXTS.match(path)
+        match = cls.EXTS.match(str(path))
         if match:
             return match.groupdict()['ext']
 
@@ -240,14 +241,15 @@ class IndexManager(object):
 
 @subscriber(event.IPackageAdded)
 def rebuild_leaf(event):
-    return event.im.regenerate_leaf(event.name)
-
+    reg = threadlocal.get_current_registry()
+    event.im.register_archive(event.path, registry=reg)
+    out = event.im.regenerate_leaf(event.name)
+    return out
 
 @subscriber(event.IIndexUpdate)
 def bulk_update_index(event):
     new_pkgs = event.index.update_data(event.datafile)
     return list(notify_packages_added(event.index, new_pkgs))
-
 
 def notify_packages_added(index, new_pkgs, reg=None):
     if reg is None:
@@ -255,7 +257,8 @@ def notify_packages_added(index, new_pkgs, reg=None):
     for data in new_pkgs:
         yield reg.notify(event.PackageAdded(index,
                                             name=data['name'],
-                                            version=data['version']))
+                                            version=data['version'],
+                                            path=index.path / data['filename']))
 
 
 @subscriber(ApplicationCreated)
