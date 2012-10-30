@@ -37,3 +37,8 @@ class PyPi(object):
     def package_details(cls, package_name, version_number):
         client = xmlrpclib.ServerProxy(cls.index)
         return client.release_urls(package_name, version_number)
+
+    @classmethod
+    def release_urls(cls, package_name, version_number):
+        client = xmlrpclib.ServerProxy(cls.index)
+        return client.release_urls(package_name, version_number)
