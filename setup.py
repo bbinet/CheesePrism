@@ -7,13 +7,14 @@ README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = ['Jinja2',
+            'Paste',
             'path.py',
             'pkginfo',
             'pyramid',
             'pyramid_debugtoolbar',
             'pyramid_jinja2',
+            'pyramid_tm',
             'requests',
-            'Paste',
             'pip']
 
 version='0.2a1'
