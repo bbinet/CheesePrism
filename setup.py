@@ -17,7 +17,7 @@ requires = ['Jinja2',
             'requests',
             'pip']
 
-version='0.2a1'
+version='0.2a2'
 
 test_requires = ['mock', 'nose'] + requires
 
@@ -46,3 +46,4 @@ setup(name='CheesePrism',
       main = cheeseprism.wsgiapp:main
       """
       )
+

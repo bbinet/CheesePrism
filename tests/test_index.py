@@ -93,9 +93,12 @@ class IndexTestCase(unittest.TestCase):
         assert leaves[0].exists()
         assert leaves[0].name == 'index.html'
         assert leaves[0].parent.name == 'dummypackage'
-        assert file_structure == expected, \
+
+        etxt = pprint(sorted(str(x) for x in expected))
+        fstxt = pprint(sorted(str(x) for x in file_structure))
+        assert set(expected).issubset(file_structure), \
                textwrap.dedent("""
-               File structure does not match::
+               Expected not a subset of result::
 
                expected:
 
@@ -103,7 +106,7 @@ class IndexTestCase(unittest.TestCase):
 
                actual:
 
-                %s""") %(pprint(expected), pprint(file_structure))
+                %s""") %(etxt, fstxt)
 
     @patch('cheeseprism.index.IndexManager.regenerate_leaf')
     def test_regenerate_leaf_event(self, rl):
@@ -224,3 +227,4 @@ class ClassOrStaticMethods(unittest.TestCase):
 
 def test_cleanup():
     assert not IndexTestCase.get_base().dirs()
+

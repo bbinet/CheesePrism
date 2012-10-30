@@ -33,9 +33,10 @@ class CPRequest(Request):
 
     @reify
     def index_data_path(self):
-        return self.imclass.datafile_path
+        return self.index.datafile_path
 
     @reify
     def index_data(self):
         return self.index.data_from_path(self.file_root / self.index_data_path)
     
+
