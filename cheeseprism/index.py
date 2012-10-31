@@ -103,8 +103,10 @@ class IndexManager(object):
     def regenerate_all(self):
         items = self.projects_from_archives()
         home_file = self.path / self.root_index_file
+        start = time.time()
         yield self.write_index_home(home_file, items)
         yield [self.write_leaf(self.path / key, value) for key, value in items]
+        logger.info("Regenerated index: %s", time.time() - start)
 
     def write_index_home(self, home_file, items):
         logger.info('Write index home:%s', home_file)
@@ -235,7 +237,7 @@ class IndexManager(object):
                 json.dump(data, root)
                 
         elapsed = time.time() - start
-        logger.info("Generate json representation of index in %s seconds" %elapsed)
+        logger.info("Rebuilt /index.json: %sms" %elapsed)
         return new
 
 

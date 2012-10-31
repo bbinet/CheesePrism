@@ -4,7 +4,7 @@ import os
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
-CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 requires = ['Jinja2',
             'Paste',
@@ -17,9 +17,10 @@ requires = ['Jinja2',
             'requests',
             'pip']
 
-version='0.2a2'
+version='0.2a3'
 
-test_requires = ['mock', 'nose'] + requires
+with open(os.path.join(here, 'tests-require.txt')) as tr:
+    test_requires = [x for x in tr.read().split() if x] + requires
 
 setup(name='CheesePrism',
       version=version,

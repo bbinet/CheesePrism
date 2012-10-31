@@ -45,6 +45,7 @@ def upload(context, request):
         return request.response
     return {}
 
+
 @view_config(name='find-packages', renderer='find_packages.html', context=resources.App)
 def find_package(context, request):
     releases = None
@@ -108,6 +109,7 @@ def regenerate_index(context, request):
     if request.method == 'POST':
         logger.debug("Regenerate index")
         homefile, leaves = request.index.regenerate_all()
+        request.index.update_data()
         logger.debug("regeneration done:\n %s %s", homefile, leaves) #@@ time it 
         return HTTPFound('/index')
     return {}
@@ -119,8 +121,6 @@ def regenerate_index(context, request):
 def from_requirements(context, request):
     if request.method == "POST":
         req_text = request.POST['req_file'].file.read()
-        index = request.index
-
         filename = path(tempfile.gettempdir()) / 'temp-req.txt'
         filename.write_text(req_text)
         

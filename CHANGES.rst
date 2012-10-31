@@ -1,4 +1,5 @@
-0.2a2
+0.2a1
+=====
 	
 2012-10-31  whit  <whit@surveymonkey.com>:
 
@@ -6,7 +7,8 @@
  * Fixed bug with index.json generation for add packages via pypi
  * Index regeneration is now package by package
  * initial work on unified 'datafile' handling via transaction
-
+ * Make 'regenerate_all' rebuild the datafile (albeit inefficiently)
+	
 0.1a1
 =====
 
