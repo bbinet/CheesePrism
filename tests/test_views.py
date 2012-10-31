@@ -130,27 +130,28 @@ class ViewTests(unittest.TestCase):
         assert isinstance(out, HTTPFound)
         assert out.location == '/find-packages'
 
-    @patch('cheeseprism.rpc.PyPi.package_details')
+    @patch('cheeseprism.rpc.PyPi.release_urls')
     def test_package_md5_matches(self, pd):
         """
         package is already in index
         """
-        from cheeseprism.views import package
+        from cheeseprism.views import from_pypi
         td = dict(name='boto',
                   version='1.2.3',
-                  md5_digest='12345')
+                  md5_digest='12345',
+                  filename='boto-1.2.3.tar.gz')
         pd.return_value = [td]        
         request = CPDummyRequest()
         request.matchdict.update(td)
         request.index_data.update({'12345':True})
-        out = package(request)
+        out = from_pypi(request)
         assert isinstance(out, HTTPFound)
         assert out.location == '/index/boto'
 
-    @patch('cheeseprism.rpc.PyPi.package_details')
+    @patch('cheeseprism.rpc.PyPi.release_urls')
     def test_package_httperror(self, pd):
         """
-        package: test catching httperror
+        from_pypi: test catching httperror
         """
         request = self.package_request(pd)
         with patch('requests.get') as get:
@@ -159,10 +160,10 @@ class ViewTests(unittest.TestCase):
             out = views.package(request)
         assert isinstance(out, HTTPFound)
 
-    @patch('cheeseprism.rpc.PyPi.package_details')
+    @patch('cheeseprism.rpc.PyPi.release_urls')
     def test_package_urlerror(self, pd):
         """
-        package: test catching urlerror
+        from_pypi: test catching urlerror
         """
         request = self.package_request(pd)
         with patch('requests.get') as get:
@@ -172,10 +173,10 @@ class ViewTests(unittest.TestCase):
         assert isinstance(out, HTTPFound)
         assert out.location == '/find-packages'
 
-    @patch('cheeseprism.rpc.PyPi.package_details')
+    @patch('cheeseprism.rpc.PyPi.release_urls')
     def test_package_good(self, pd):
         """
-        package: test catching urlerror
+        from_pypi: test catching urlerror
         """
         request = self.package_request(pd)
         request.file_root.mkdir()
@@ -187,10 +188,10 @@ class ViewTests(unittest.TestCase):
         assert isinstance(out, HTTPFound)
         assert out.location == '/index/boto'
 
-    @patch('cheeseprism.rpc.PyPi.package_details')
+    @patch('cheeseprism.rpc.PyPi.release_urls')
     def test_package_downloads_ok_but_bad(self, pd):
         """
-        package: test catching urlerror
+        from_pypi: test catching urlerror
         """
         request = self.package_request(pd)
         request.file_root.mkdir()
@@ -242,8 +243,8 @@ class ViewTests(unittest.TestCase):
         out = regenerate_index(context, req)
         assert isinstance(out, HTTPFound)
         assert req.file_root.exists(), "index not created at %s" %req.file_root
-        assert len(req.file_root.files()) == 1
-        assert req.file_root.files()[0].name == 'index.html'
+        assert len(req.file_root.files()) == 2
+        assert set([x.name for x in req.file_root.files()]) == set(('index.html', 'index.json'))
 
     @raises(RuntimeError)
     def test_upload_raises(self):
@@ -271,7 +272,6 @@ class ViewTests(unittest.TestCase):
     def test_from_requirements_GET(self):
         from cheeseprism.views import from_requirements
         context, request = self.base_cr
-        
 
     def test_from_requirements_POST(self):
         from cheeseprism.views import from_requirements
