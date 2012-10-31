@@ -237,7 +237,7 @@ class IndexManager(object):
                 json.dump(data, root)
                 
         elapsed = time.time() - start
-        logger.info("Rebuilt /index.json: %sms" %elapsed)
+        logger.info("Rebuilt /index.json: %ss" %elapsed)
         return new
 
 
