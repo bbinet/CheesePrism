@@ -1,3 +1,12 @@
+0.2a2
+	
+2012-10-31  whit  <whit@surveymonkey.com>:
+
+ * Filter non-source distribution downloads from pypi
+ * Fixed bug with index.json generation for add packages via pypi
+ * Index regeneration is now package by package
+ * initial work on unified 'datafile' handling via transaction
+
 0.1a1
 =====
 
@@ -5,7 +14,7 @@ Initial alpha release.
 
 Development Log
 ---------------
-	
+
 2012-01-09  whit  <whit@surveymonkey.com>:
  * Recursive download of requirements files and dependencies
  * Search of pypi and download of files
@@ -26,6 +35,6 @@ Development Log
 
 2011-11-07  whit  <whit@surveymonkey.com>:
  * Get app basically serving
-  
+
 2011-11-07  whit  <whit@surveymonkey.com>:
  * Setup initial package structure  
