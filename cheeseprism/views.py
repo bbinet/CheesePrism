@@ -110,7 +110,6 @@ def regenerate_index(context, request):
         logger.debug("Regenerate index")
         homefile, leaves = request.index.regenerate_all()
         request.index.update_data()
-        logger.debug("regeneration done:\n %s %s", homefile, leaves) #@@ time it 
         return HTTPFound('/index')
     return {}
 
