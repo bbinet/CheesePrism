@@ -16,6 +16,7 @@ import unittest
 
 here = path(__file__).parent
 
+
 class CPDummyRequest(testing.DummyRequest):
     test_dir = None
     counter = itertools.count()
@@ -254,6 +255,21 @@ class ViewTests(unittest.TestCase):
         request.method = 'POST'
         upload(context, request)
 
+    @raises(RuntimeError)
+    def test_upload_raises_packageadded(self):
+        """
+        If adding the package raises an error, an exception should be logged
+        """
+        from cheeseprism.views import upload
+        self.setup_event()
+        context, request = self.base_cr
+        request.method = 'POST'
+        request.POST['content'] = FakeFS(path('dummypackage2/dist/dummypackage-0.1.tar.gz'))
+        with patch('cheeseprism.views.event.PackageAdded',
+                   side_effect=RuntimeError('Kaboom')):
+            with patch('path.path.write_bytes'):
+                upload(context, request)
+
     @patch('path.path.write_bytes')
     def test_upload(self, wb):
         from cheeseprism.views import upload
@@ -272,6 +288,7 @@ class ViewTests(unittest.TestCase):
     def test_from_requirements_GET(self):
         from cheeseprism.views import from_requirements
         context, request = self.base_cr
+        assert from_requirements(context, request) == {}
 
     def test_from_requirements_POST(self):
         from cheeseprism.views import from_requirements
@@ -300,3 +317,4 @@ def mock_downloader():
         dler.errors = ('error',)
         dl.req_set_from_file.return_value = (dl, Mock(name='finder'))
         yield dl
+

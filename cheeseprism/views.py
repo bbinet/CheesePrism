@@ -37,12 +37,17 @@ def upload(context, request):
             raise RuntimeError('No file attached') 
 
         fieldstorage = request.POST['content']
-        dest = path(request.file_root) / utils.secure_filename(fieldstorage.filename)
+        filename = fieldstorage.filename
+        dest = path(request.file_root) / utils.secure_filename(filename)
 
         dest.write_bytes(fieldstorage.file.read())
-        request.registry.notify(event.PackageAdded(request.index, path=dest))
-        request.response.headers['X-Swalow-Status'] = 'SUCCESS'
-        return request.response
+        try:
+            request.registry.notify(event.PackageAdded(request.index, path=dest))
+            request.response.headers['X-Swalow-Status'] = 'SUCCESS'
+            return request.response
+        except :
+            logger.exception("Processing of %s failed", filename)
+            raise
     return {}
 
 
@@ -149,4 +154,5 @@ def from_requirements(context, request):
         
         return HTTPFound('/load-requirements')
     return {}
+
 

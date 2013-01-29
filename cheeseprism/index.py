@@ -243,10 +243,12 @@ class IndexManager(object):
 
 @subscriber(event.IPackageAdded)
 def rebuild_leaf(event):
+    logger.info("Rebuilding leaf for %s, adding %s" %(event.name, event.path))
     reg = threadlocal.get_current_registry()
     event.im.register_archive(event.path, registry=reg)
     out = event.im.regenerate_leaf(event.name)
     return out
+
 
 @subscriber(event.IIndexUpdate)
 def bulk_update_index(event):
@@ -261,7 +263,6 @@ def notify_packages_added(index, new_pkgs, reg=None):
                                             name=data['name'],
                                             version=data['version'],
                                             path=index.path / data['filename']))
-
 
 @subscriber(ApplicationCreated)
 def bulk_update_index_at_start(event):
@@ -311,6 +312,7 @@ class EnvFactory(object):
         choices = [jinja2.PackageLoader('cheeseprism', 'templates/index')]
         if config: [choices.insert(0, loader) for loader in factory.loaders]
         return factory.env_class(loader=jinja2.ChoiceLoader(choices))
+
 
 
 
