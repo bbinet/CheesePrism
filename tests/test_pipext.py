@@ -33,7 +33,7 @@ class PipExtBase(unittest.TestCase):
     @property
     def base(self): return self.get_base()
     
-    def makeone(self, dd=None):
+    def makeone(self):
         from cheeseprism import pipext
         rs, finder = self.make_finder_and_reqset()
         return pipext.RequirementDownloader(rs, finder=finder)
@@ -59,6 +59,7 @@ class TestReqDownloader(PipExtBase):
     """
     Catch all coverage tests for RequirementsDownloader
     """
+
     def test_init(self):
         """
         Sanity test creation
@@ -67,8 +68,8 @@ class TestReqDownloader(PipExtBase):
         reqs = rd.req_set.requirements
         assert len(reqs.values()) == 1
         assert reqs.keys() == ['dummypackage'], reqs.keys()
-        self.download_dir = None
-        rd = self.makeone(dd='')
+        self.download_dir = ''
+        rd = self.makeone()
 
     @patch('requests.get')
     def test_download_url(self, mockget):
@@ -239,3 +240,4 @@ class TestReqDownloaderAll(PipExtBase):
 
 class RSMock(Mock):
     requirements = dict(something_else="something_else_requirement")
+
