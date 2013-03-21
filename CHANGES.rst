@@ -1,3 +1,12 @@
+0.2a3/4
+=======
+
+2013-03-21  Whit  <whit@surveymonkey.com>
+
+ * Cleanup logging
+ * Test cleanups and fixes
+
+
 0.2a1
 =====
 	
