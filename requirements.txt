@@ -1,1 +1,1 @@
-Pyramid==1.0
+Pyramid
