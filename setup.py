@@ -17,7 +17,7 @@ requires = ['Jinja2',
             'requests',
             'pip']
 
-version='0.2a3'
+version='0.3'
 
 with open(os.path.join(here, 'tests-require.txt')) as tr:
     test_requires = [x for x in tr.read().split() if x] + requires
@@ -47,4 +47,5 @@ setup(name='CheesePrism',
       main = cheeseprism.wsgiapp:main
       """
       )
+
 
