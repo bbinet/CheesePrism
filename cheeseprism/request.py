@@ -37,6 +37,6 @@ class CPRequest(Request):
 
     @reify
     def index_data(self):
-        return self.index.data_from_path(self.file_root / self.index_data_path)
+        return self.index.data_from_path(self.index_data_path)
     
 
